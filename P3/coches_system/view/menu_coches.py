@@ -82,22 +82,67 @@ class MenuCoches:
         self.ventana.title("Actualizar Autos")
         Label(self.ventana, text="ACTUALIZAR AUTOS", font=("Times New Roman", 24,"bold")).pack(pady=20)
 
-        Label(self.ventana, text="ID del Auto a actualizar:").pack(pady=5)
-        self.c_id_upd = Entry(self.ventana)
-        self.c_id_upd.pack()
-        
-        Label(self.ventana, text="Nueva Marca:").pack(pady=5); self.c_marca_upd = Entry(self.ventana); self.c_marca_upd.pack()
-        Label(self.ventana, text="Nuevo Color:").pack(pady=5); self.c_color_upd = Entry(self.ventana); self.c_color_upd.pack()
-        Label(self.ventana, text="Nuevo Modelo:").pack(pady=5); self.c_modelo_upd = Entry(self.ventana); self.c_modelo_upd.pack()
-        Label(self.ventana, text="Nueva Velocidad:").pack(pady=5); self.c_velocidad_upd = Entry(self.ventana); self.c_velocidad_upd.pack()
-        Label(self.ventana, text="Nuevo Caballaje:").pack(pady=5); self.c_caballaje_upd = Entry(self.ventana); self.c_caballaje_upd.pack()
-        Label(self.ventana, text="Nuevas Plazas:").pack(pady=5); self.c_plazas_upd = Entry(self.ventana); self.c_plazas_upd.pack()
+        # Frame para la búsqueda
+        frame_busqueda = Frame(self.ventana)
+        frame_busqueda.pack(pady=10)
+
+        Label(frame_busqueda, text="ID del Auto a actualizar:").pack(side=LEFT, padx=5)
+        self.c_id_upd = Entry(frame_busqueda)
+        self.c_id_upd.pack(side=LEFT, padx=5)
+
+        # Frame para los campos de edición (inicialmente oculto o vacío)
+        self.frame_edicion = Frame(self.ventana)
+        self.frame_edicion.pack(pady=10)
+
+        def buscar_auto():
+            id_buscar = self.c_id_upd.get()
+            if not id_buscar:
+                messagebox.showwarning("Error", "Ingrese un ID")
+                return
+
+            registro = AutosController.consultar_por_id(id_buscar)
+            
+            # Limpiar frame de edición por si acaso se busca otro ID
+            for widget in self.frame_edicion.winfo_children():
+                widget.destroy()
+
+            if registro:
+                messagebox.showinfo("Encontrado", "El auto existe, puede actualizar los datos.")
+                
+                # registro: (id, color, marca, modelo, velocidad, caballaje, plazas) -> OJO con el orden en tu BD
+                # En menu_coches.py consultar_autos usaba indices: 0=id, 1=color, 2=marca, 3=modelo, 4=vel...
+                # Asumiremos el orden de la tupla devuelta por SELECT *:
+                # id, marca, color, modelo, velocidad, caballaje, plazas (segun el INSERT: marca, color, modelo...)
+                # Si el INSERT es (marca, color...), en la BD suele ser id, marca, color... o id, color, marca...
+                # Voy a asumir el orden basado en el INSERT del modelo: 
+                # INSERT INTO coches (marca, color, modelo, velocidad, caballaje, plazas)
+                # Entonces SELECT * suele devolver: (id, marca, color, modelo, velocidad, caballaje, plazas)
+                
+                # Campos
+                Label(self.frame_edicion, text="Marca:").pack(); self.c_marca_upd = Entry(self.frame_edicion); self.c_marca_upd.pack()
+                self.c_marca_upd.insert(0, registro[2]) # Marca (Index 2 based on previous code)
+
+                Label(self.frame_edicion, text="Color:").pack(); self.c_color_upd = Entry(self.frame_edicion); self.c_color_upd.pack()
+                self.c_color_upd.insert(0, registro[1]) # Color (Index 1 based on previous code)
+
+                Label(self.frame_edicion, text="Modelo:").pack(); self.c_modelo_upd = Entry(self.frame_edicion); self.c_modelo_upd.pack()
+                self.c_modelo_upd.insert(0, registro[3]) # Modelo
+
+                Label(self.frame_edicion, text="Velocidad:").pack(); self.c_velocidad_upd = Entry(self.frame_edicion); self.c_velocidad_upd.pack()
+                self.c_velocidad_upd.insert(0, registro[4]) # Velocidad
+
+                Label(self.frame_edicion, text="Caballaje:").pack(); self.c_caballaje_upd = Entry(self.frame_edicion); self.c_caballaje_upd.pack()
+                self.c_caballaje_upd.insert(0, registro[5]) # Caballaje
+
+                Label(self.frame_edicion, text="Plazas:").pack(); self.c_plazas_upd = Entry(self.frame_edicion); self.c_plazas_upd.pack()
+                self.c_plazas_upd.insert(0, registro[6]) # Plazas
+
+                Button(self.frame_edicion, text="Actualizar", command=actualizar_datos).pack(pady=20)
+
+            else:
+                messagebox.showerror("Error", "No se encontró un auto con ese ID")
 
         def actualizar_datos():
-            if self.c_id_upd.get() == "":
-                messagebox.showwarning("Error", "Falta el ID")
-                return
-            
             exito = AutosController.actualizar(
                 self.c_id_upd.get(),
                 self.c_marca_upd.get(),
@@ -112,9 +157,9 @@ class MenuCoches:
                 messagebox.showinfo("Éxito", "Auto actualizado correctamente")
                 self.menu_acciones_coches()
             else:
-                messagebox.showerror("Error", "Error al actualizar (Revise el ID)")
+                messagebox.showerror("Error", "Error al actualizar")
 
-        Button(self.ventana, text="Actualizar", command=actualizar_datos).pack(pady=20)
+        Button(frame_busqueda, text="Buscar", command=buscar_auto).pack(side=LEFT, padx=10)
         Button(self.ventana, text="Regresar", command=self.menu_acciones_coches).pack(pady=10)
 
     def borrar_autos(self):

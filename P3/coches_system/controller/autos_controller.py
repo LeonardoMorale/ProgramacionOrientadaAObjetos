@@ -6,6 +6,10 @@ class AutosController:
         return Autos.consultar()
 
     @staticmethod
+    def consultar_por_id(id_coche):
+        return Autos.consultar_por_id(id_coche)
+
+    @staticmethod
     def insertar(marca, color, modelo, velocidad, caballaje, plazas):
         return Autos.insertar(marca, color, modelo, velocidad, caballaje, plazas)
 

@@ -86,11 +86,92 @@ class MenuCamionetas:
         self.ventana.title("Actualizar Camioneta")
         Label(self.ventana, text="ACTUALIZAR CAMIONETA", font=("Times New Roman", 24,"bold")).pack(pady=20)
         
-        Label(self.ventana, text="ID a actualizar:").pack(); self.cta_id_upd = Entry(self.ventana); self.cta_id_upd.pack()
-        # Aquí puedes añadir los campos que quieras editar
-        Label(self.ventana, text="Nueva Tracción:").pack(); self.cta_traccion_upd = Entry(self.ventana); self.cta_traccion_upd.pack()
+        # Frame para la búsqueda
+        frame_busqueda = Frame(self.ventana)
+        frame_busqueda.pack(pady=10)
 
-        Button(self.ventana, text="Actualizar", command=lambda: messagebox.showinfo("Info", "Actualizar Camioneta")).pack(pady=20)
+        Label(frame_busqueda, text="ID a actualizar:").pack(side=LEFT, padx=5)
+        self.cta_id_upd = Entry(frame_busqueda)
+        self.cta_id_upd.pack(side=LEFT, padx=5)
+
+        # Frame para los campos de edición (inicialmente oculto o vacío)
+        self.frame_edicion = Frame(self.ventana)
+        self.frame_edicion.pack(pady=10)
+
+        def buscar_camioneta():
+            id_buscar = self.cta_id_upd.get()
+            if not id_buscar:
+                messagebox.showwarning("Error", "Ingrese un ID")
+                return
+
+            registro = CamionetasController.consultar_por_id(id_buscar)
+            
+            # Limpiar frame de edición
+            for widget in self.frame_edicion.winfo_children():
+                widget.destroy()
+
+            if registro:
+                messagebox.showinfo("Encontrado", "La camioneta existe, puede actualizar los datos.")
+                
+                # registro: (id, color, marca, modelo, velocidad, caballaje, plazas, traccion, cerrada)
+                # NOTA: El orden depende de la BD. 
+                # En menu_camionetas.py consultar_camionetas usa: 0=id, 2=marca, 3=modelo, 7=traccion
+                # Asumiremos el orden del INSERT: marca, color, modelo, velocidad, caballaje, plazas, traccion, cerrada
+                # SELECT * suele devolver: (id, marca, color, modelo, velocidad, caballaje, plazas, traccion, cerrada)
+                # Pero en consultar_camionetas linea 79 dice: "registro[2] | Marca", "registro[3] | Modelo".
+                # Si id es 0.
+                # Si marca es 2, entonces color es 1?
+                # Vamos a asumir: 0=id, 1=color, 2=marca, 3=modelo, 4=velocidad, 5=caballaje, 6=plazas, 7=traccion, 8=cerrada
+                # Esto coincide con lo que vi en Autos (color antes que marca en algunos logs, o viceversa).
+                # Ajustaré los índices basándome en el código existente de consultar:
+                # registro[2] es Marca. registro[3] es Modelo. registro[7] es Traccion.
+                # Entonces: 0=id, 1=color, 2=marca, 3=modelo, 4=velocidad, 5=caballaje, 6=plazas, 7=traccion, 8=cerrada.
+                
+                # Campos a actualizar
+                Label(self.frame_edicion, text="Marca:").pack(); self.cta_marca_upd = Entry(self.frame_edicion); self.cta_marca_upd.pack()
+                self.cta_marca_upd.insert(0, registro[2])
+
+                Label(self.frame_edicion, text="Color:").pack(); self.cta_color_upd = Entry(self.frame_edicion); self.cta_color_upd.pack()
+                self.cta_color_upd.insert(0, registro[1])
+
+                Label(self.frame_edicion, text="Modelo:").pack(); self.cta_modelo_upd = Entry(self.frame_edicion); self.cta_modelo_upd.pack()
+                self.cta_modelo_upd.insert(0, registro[3])
+
+                Label(self.frame_edicion, text="Velocidad:").pack(); self.cta_vel_upd = Entry(self.frame_edicion); self.cta_vel_upd.pack()
+                self.cta_vel_upd.insert(0, registro[4])
+
+                Label(self.frame_edicion, text="Caballaje:").pack(); self.cta_cab_upd = Entry(self.frame_edicion); self.cta_cab_upd.pack()
+                self.cta_cab_upd.insert(0, registro[5])
+
+                Label(self.frame_edicion, text="Plazas:").pack(); self.cta_plazas_upd = Entry(self.frame_edicion); self.cta_plazas_upd.pack()
+                self.cta_plazas_upd.insert(0, registro[6])
+
+                Label(self.frame_edicion, text="Tracción (ej. 4x4):").pack(); self.cta_traccion_upd = Entry(self.frame_edicion); self.cta_traccion_upd.pack()
+                self.cta_traccion_upd.insert(0, registro[7])
+
+                Label(self.frame_edicion, text="¿Cerrada? (1=Si, 0=No):").pack(); self.cta_cerrada_upd = Entry(self.frame_edicion); self.cta_cerrada_upd.pack()
+                self.cta_cerrada_upd.insert(0, registro[8])
+
+                Button(self.frame_edicion, text="Actualizar", command=guardar_actualizacion).pack(pady=20)
+
+            else:
+                messagebox.showerror("Error", "No se encontró una camioneta con ese ID")
+
+        def guardar_actualizacion():
+            exito = CamionetasController.actualizar(
+                self.cta_id_upd.get(),
+                self.cta_marca_upd.get(), self.cta_color_upd.get(), self.cta_modelo_upd.get(),
+                self.cta_vel_upd.get(), self.cta_cab_upd.get(), self.cta_plazas_upd.get(),
+                self.cta_traccion_upd.get(), self.cta_cerrada_upd.get()
+            )
+
+            if exito:
+                messagebox.showinfo("Éxito", "Camioneta actualizada correctamente")
+                self.menu_acciones_camionetas()
+            else:
+                messagebox.showerror("Error", "No se pudo actualizar")
+
+        Button(frame_busqueda, text="Buscar", command=buscar_camioneta).pack(side=LEFT, padx=10)
         Button(self.ventana, text="Regresar", command=self.menu_acciones_camionetas).pack(pady=10)
 
     def borrar_camionetas(self):

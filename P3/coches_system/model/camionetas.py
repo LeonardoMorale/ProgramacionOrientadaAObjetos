@@ -15,6 +15,15 @@ class Camionetas:
             return []
 
     @staticmethod
+    def consultar_por_id(id_camioneta):
+        try:
+            cursor.execute("SELECT * FROM camionetas WHERE id = %s", (id_camioneta,))
+            return cursor.fetchone()
+        except Exception as e:
+            print(f"Error al consultar camioneta por ID: {e}")
+            return None
+
+    @staticmethod
     def insertar(marca, color, modelo, velocidad, caballaje, plazas, traccion, cerrada):
         try:
             sql = "INSERT INTO camionetas (marca, color, modelo, velocidad, caballaje, plazas, traccion, cerrada) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)"

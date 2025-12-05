@@ -6,6 +6,10 @@ class CamionetasController:
         return Camionetas.consultar()
 
     @staticmethod
+    def consultar_por_id(id_camioneta):
+        return Camionetas.consultar_por_id(id_camioneta)
+
+    @staticmethod
     def insertar(marca, color, modelo, velocidad, caballaje, plazas, traccion, cerrada):
         return Camionetas.insertar(marca, color, modelo, velocidad, caballaje, plazas, traccion, cerrada)
 

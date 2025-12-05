@@ -14,6 +14,15 @@ class Autos:
             return []
 
     @staticmethod
+    def consultar_por_id(id_coche):
+        try:
+            cursor.execute("SELECT * FROM coches WHERE id = %s", (id_coche,))
+            return cursor.fetchone()
+        except Exception as e:
+            print(f"Error al consultar coche por ID: {e}")
+            return None
+
+    @staticmethod
     def insertar(marca, color, modelo, velocidad, caballaje, plazas):
         try:
             sql = "INSERT INTO coches (marca, color, modelo, velocidad, caballaje, plazas) VALUES (%s, %s, %s, %s, %s, %s)"
