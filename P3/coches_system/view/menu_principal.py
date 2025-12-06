@@ -26,7 +26,6 @@ class MenuPrincipal:
 
         Label(frame_menu, text="GESTION DE COCHES", font=("Times New Roman", 24,"bold")).pack(pady=20)
 
-        # He conectado los comandos a sus funciones correspondientes
         Button(frame_menu, text="Coches", command=self.abrir_coches).pack(pady=10)
         Button(frame_menu, text="Camionetas", command=self.abrir_camionetas).pack(pady=10)
         Button(frame_menu, text="Camiones", command=self.abrir_camiones).pack(pady=10)

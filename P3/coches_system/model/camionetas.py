@@ -1,9 +1,5 @@
 from conexionBD import conexion, cursor 
 
-# ---------------------------------------------------------
-# CLASE CAMIONETAS (Tabla: camionetas)
-# Campos extra: traccion, cerrada
-# ---------------------------------------------------------
 class Camionetas:
     @staticmethod
     def consultar():

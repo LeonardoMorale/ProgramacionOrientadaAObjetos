@@ -41,12 +41,11 @@ class MenuCamionetas:
 
         # Función interna para capturar datos y guardar
         def guardar_datos():
-            # Validar que no estén vacíos (opcional pero recomendado)
             if self.cta_marca.get() == "":
                 messagebox.showwarning("Error", "Faltan datos")
                 return
 
-            # Llamar al MODELO
+            # Llamar al modelo
             exito = CamionetasController.insertar(
                 self.cta_marca.get(), self.cta_color.get(), self.cta_modelo.get(),
                 self.cta_vel.get(), self.cta_cab.get(), self.cta_plazas.get(),
@@ -67,7 +66,7 @@ class MenuCamionetas:
         self.ventana.title("Consultar Camionetas")
         Label(self.ventana, text="LISTADO CAMIONETAS", font=("Times New Roman", 24,"bold")).pack(pady=20)
 
-        # Llamada al MODELO
+        # Llamada al modelo
         registros = CamionetasController.consultar()
         
         cadena = ""
@@ -112,20 +111,6 @@ class MenuCamionetas:
 
             if registro:
                 messagebox.showinfo("Encontrado", "La camioneta existe, puede actualizar los datos.")
-                
-                # registro: (id, color, marca, modelo, velocidad, caballaje, plazas, traccion, cerrada)
-                # NOTA: El orden depende de la BD. 
-                # En menu_camionetas.py consultar_camionetas usa: 0=id, 2=marca, 3=modelo, 7=traccion
-                # Asumiremos el orden del INSERT: marca, color, modelo, velocidad, caballaje, plazas, traccion, cerrada
-                # SELECT * suele devolver: (id, marca, color, modelo, velocidad, caballaje, plazas, traccion, cerrada)
-                # Pero en consultar_camionetas linea 79 dice: "registro[2] | Marca", "registro[3] | Modelo".
-                # Si id es 0.
-                # Si marca es 2, entonces color es 1?
-                # Vamos a asumir: 0=id, 1=color, 2=marca, 3=modelo, 4=velocidad, 5=caballaje, 6=plazas, 7=traccion, 8=cerrada
-                # Esto coincide con lo que vi en Autos (color antes que marca en algunos logs, o viceversa).
-                # Ajustaré los índices basándome en el código existente de consultar:
-                # registro[2] es Marca. registro[3] es Modelo. registro[7] es Traccion.
-                # Entonces: 0=id, 1=color, 2=marca, 3=modelo, 4=velocidad, 5=caballaje, 6=plazas, 7=traccion, 8=cerrada.
                 
                 # Campos a actualizar
                 Label(self.frame_edicion, text="Marca:").pack(); self.cta_marca_upd = Entry(self.frame_edicion); self.cta_marca_upd.pack()
@@ -188,7 +173,7 @@ class MenuCamionetas:
             if not id_borrar:
                 return
             
-            # Llamada al MODELO
+            # Llamada al modelo
             if CamionetasController.borrar(id_borrar):
                 messagebox.showinfo("Éxito", "Camioneta eliminada")
                 self.menu_acciones_camionetas()

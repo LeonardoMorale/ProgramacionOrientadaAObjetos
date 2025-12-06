@@ -41,7 +41,7 @@ class MenuCoches:
                 messagebox.showwarning("Error", "Faltan datos")
                 return
             
-            # Llamamos a Autos del archivo model/coches.py
+            # Llamamos al modelo
             exito = AutosController.insertar(
                 self.c_marca.get(), self.c_color.get(), self.c_modelo.get(),
                 self.c_velocidad.get(), self.c_caballaje.get(), self.c_plazas.get()
@@ -68,8 +68,6 @@ class MenuCoches:
             cadena = "No hay autos registrados."
         else:
             for registro in registros:
-                # Ajustado a tu SQL: id, color, marca, modelo, velocidad, caballaje, plazas
-                # Nota: Verifica el orden de columnas en tu BD, aquí asumo el orden estándar del SELECT *
                 cadena += f"ID: {registro[0]} | Marca: {registro[2]} | Color: {registro[1]} | Modelo: {registro[3]} | Vel: {registro[4]}\n"
         
         lbl_registros = Label(self.ventana, text=cadena, justify=LEFT)
@@ -90,7 +88,7 @@ class MenuCoches:
         self.c_id_upd = Entry(frame_busqueda)
         self.c_id_upd.pack(side=LEFT, padx=5)
 
-        # Frame para los campos de edición (inicialmente oculto o vacío)
+        # Frame para los campos de edición
         self.frame_edicion = Frame(self.ventana)
         self.frame_edicion.pack(pady=10)
 
@@ -109,21 +107,12 @@ class MenuCoches:
             if registro:
                 messagebox.showinfo("Encontrado", "El auto existe, puede actualizar los datos.")
                 
-                # registro: (id, color, marca, modelo, velocidad, caballaje, plazas) -> OJO con el orden en tu BD
-                # En menu_coches.py consultar_autos usaba indices: 0=id, 1=color, 2=marca, 3=modelo, 4=vel...
-                # Asumiremos el orden de la tupla devuelta por SELECT *:
-                # id, marca, color, modelo, velocidad, caballaje, plazas (segun el INSERT: marca, color, modelo...)
-                # Si el INSERT es (marca, color...), en la BD suele ser id, marca, color... o id, color, marca...
-                # Voy a asumir el orden basado en el INSERT del modelo: 
-                # INSERT INTO coches (marca, color, modelo, velocidad, caballaje, plazas)
-                # Entonces SELECT * suele devolver: (id, marca, color, modelo, velocidad, caballaje, plazas)
-                
                 # Campos
                 Label(self.frame_edicion, text="Marca:").pack(); self.c_marca_upd = Entry(self.frame_edicion); self.c_marca_upd.pack()
-                self.c_marca_upd.insert(0, registro[2]) # Marca (Index 2 based on previous code)
+                self.c_marca_upd.insert(0, registro[2]) # Marca
 
                 Label(self.frame_edicion, text="Color:").pack(); self.c_color_upd = Entry(self.frame_edicion); self.c_color_upd.pack()
-                self.c_color_upd.insert(0, registro[1]) # Color (Index 1 based on previous code)
+                self.c_color_upd.insert(0, registro[1]) # Color
 
                 Label(self.frame_edicion, text="Modelo:").pack(); self.c_modelo_upd = Entry(self.frame_edicion); self.c_modelo_upd.pack()
                 self.c_modelo_upd.insert(0, registro[3]) # Modelo

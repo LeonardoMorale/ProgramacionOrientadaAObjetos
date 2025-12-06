@@ -1,9 +1,5 @@
 from conexionBD import conexion, cursor 
 
-# ---------------------------------------------------------
-# CLASE CAMIONES (Tabla: camiones)
-# Campos extra: eje, capacidadCarga
-# ---------------------------------------------------------
 class Camiones:
     @staticmethod
     def consultar():
@@ -13,6 +9,15 @@ class Camiones:
         except Exception as e:
             print(f"Error al consultar camiones: {e}")
             return []
+
+    @staticmethod
+    def consultar_por_id(id_camion):
+        try:
+            cursor.execute("SELECT * FROM camiones WHERE id = %s", (id_camion,))
+            return cursor.fetchone()
+        except Exception as e:
+            print(f"Error al consultar camion por ID: {e}")
+            return None
 
     @staticmethod
     def insertar(marca, color, modelo, velocidad, caballaje, plazas, eje, capacidadCarga):

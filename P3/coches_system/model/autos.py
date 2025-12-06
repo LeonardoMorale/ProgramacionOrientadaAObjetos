@@ -1,8 +1,5 @@
 from conexionBD import conexion, cursor 
 
-# ---------------------------------------------------------
-# CLASE AUTOS (Tabla: coches)
-# ---------------------------------------------------------
 class Autos:
     @staticmethod
     def consultar():

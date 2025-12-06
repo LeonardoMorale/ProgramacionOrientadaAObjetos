@@ -82,10 +82,79 @@ class MenuCamiones:
         self.ventana.title("Actualizar Camion")
         Label(self.ventana, text="ACTUALIZAR CAMION", font=("Times New Roman", 24,"bold")).pack(pady=20)
         
-        Label(self.ventana, text="ID a actualizar:").pack(); self.cam_id_upd = Entry(self.ventana); self.cam_id_upd.pack()
-        Label(self.ventana, text="Nueva Capacidad:").pack(); self.cam_carga_upd = Entry(self.ventana); self.cam_carga_upd.pack()
+        # Frame para la búsqueda
+        frame_busqueda = Frame(self.ventana)
+        frame_busqueda.pack(pady=10)
 
-        Button(self.ventana, text="Actualizar", command=lambda: messagebox.showinfo("Info", "Actualizar Camion")).pack(pady=20)
+        Label(frame_busqueda, text="ID a actualizar:").pack(side=LEFT, padx=5)
+        self.cam_id_upd = Entry(frame_busqueda)
+        self.cam_id_upd.pack(side=LEFT, padx=5)
+
+        # Frame para los campos de edición
+        self.frame_edicion = Frame(self.ventana)
+        self.frame_edicion.pack(pady=10)
+
+        def buscar_camion():
+            id_buscar = self.cam_id_upd.get()
+            if not id_buscar:
+                messagebox.showwarning("Error", "Ingrese un ID")
+                return
+
+            registro = CamionesController.consultar_por_id(id_buscar)
+            
+            # Limpiar frame de edición
+            for widget in self.frame_edicion.winfo_children():
+                widget.destroy()
+
+            if registro:
+                messagebox.showinfo("Encontrado", "El camión existe, puede actualizar los datos.")
+                
+                # registro: id, color, marca, modelo, velocidad, caballaje, plazas, eje, capacidadCarga
+                
+                Label(self.frame_edicion, text="Marca:").pack(); self.cam_marca_upd = Entry(self.frame_edicion); self.cam_marca_upd.pack()
+                self.cam_marca_upd.insert(0, registro[2])
+
+                Label(self.frame_edicion, text="Color:").pack(); self.cam_color_upd = Entry(self.frame_edicion); self.cam_color_upd.pack()
+                self.cam_color_upd.insert(0, registro[1])
+
+                Label(self.frame_edicion, text="Modelo:").pack(); self.cam_modelo_upd = Entry(self.frame_edicion); self.cam_modelo_upd.pack()
+                self.cam_modelo_upd.insert(0, registro[3])
+
+                Label(self.frame_edicion, text="Velocidad:").pack(); self.cam_vel_upd = Entry(self.frame_edicion); self.cam_vel_upd.pack()
+                self.cam_vel_upd.insert(0, registro[4])
+
+                Label(self.frame_edicion, text="Caballaje:").pack(); self.cam_cab_upd = Entry(self.frame_edicion); self.cam_cab_upd.pack()
+                self.cam_cab_upd.insert(0, registro[5])
+
+                Label(self.frame_edicion, text="Plazas:").pack(); self.cam_plazas_upd = Entry(self.frame_edicion); self.cam_plazas_upd.pack()
+                self.cam_plazas_upd.insert(0, registro[6])
+
+                Label(self.frame_edicion, text="Número de Ejes:").pack(); self.cam_eje_upd = Entry(self.frame_edicion); self.cam_eje_upd.pack()
+                self.cam_eje_upd.insert(0, registro[7])
+
+                Label(self.frame_edicion, text="Capacidad Carga (Kg):").pack(); self.cam_carga_upd = Entry(self.frame_edicion); self.cam_carga_upd.pack()
+                self.cam_carga_upd.insert(0, registro[8])
+
+                Button(self.frame_edicion, text="Actualizar", command=guardar_actualizacion).pack(pady=20)
+
+            else:
+                messagebox.showerror("Error", "No se encontró un camión con ese ID")
+
+        def guardar_actualizacion():
+            exito = CamionesController.actualizar(
+                self.cam_id_upd.get(),
+                self.cam_marca_upd.get(), self.cam_color_upd.get(), self.cam_modelo_upd.get(),
+                self.cam_vel_upd.get(), self.cam_cab_upd.get(), self.cam_plazas_upd.get(),
+                self.cam_eje_upd.get(), self.cam_carga_upd.get()
+            )
+
+            if exito:
+                messagebox.showinfo("Éxito", "Camión actualizado correctamente")
+                self.menu_acciones_camiones()
+            else:
+                messagebox.showerror("Error", "No se pudo actualizar")
+
+        Button(frame_busqueda, text="Buscar", command=buscar_camion).pack(side=LEFT, padx=10)
         Button(self.ventana, text="Regresar", command=self.menu_acciones_camiones).pack(pady=10)
 
     def borrar_camiones(self):
